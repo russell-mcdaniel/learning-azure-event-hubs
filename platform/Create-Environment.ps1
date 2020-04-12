@@ -1,35 +1,37 @@
-# Requirements:
+# Requirements
 # * PowerShell 5.1 or newer.
 # * Azure PowerShell module - https://docs.microsoft.com/en-us/powershell/azure
 
 # Log in to Azure
 #Connect-AzAccount
 
+$resourceGroupName = "learning-azure-event-hubs"
+$resourceLocation = "West US 2"
+$eventHubsNamespaceName = "learning-azure-event-hubs"
+$storageAccountName = "learningeventhubs"
+$storageContainerName = "event-hubs-checkpoints"
+
 # Resource Group
-# Name:                learning-azure-storage
-# Location:            westus2 (West US 2)
-#New-AzResourceGroup –Name learning-azure-storage –Location westus2
+New-AzResourceGroup -ResourceGroupName $resourceGroupName –Location $resourceLocation
 
 # Event Hub Namespace
-# Name:                learning-azure-storage
 # Tier:                Basic
-# Location:            westus2 (West US 2)
 # TU:                  1
-#New-AzEventHubNamespace -ResourceGroupName learning-azure-storage -NamespaceName learning-azure-storage -Location westus2 -SkuName Basic -SkuCapacity 1
+New-AzEventHubNamespace -ResourceGroupName $resourceGroupName -NamespaceName $eventHubsNamespaceName -Location $resourceLocation -SkuName Basic -SkuCapacity 1
 
 # Event Hub
-# Name:                hub-1
 # Partitions:          4 (2 is default, minimum)
-#New-AzEventHub -ResourceGroupName learning-azure-storage -NamespaceName learning-azure-storage -EventHubName hub-1 -PartitionCount 4 -MessageRetentionInDays 1
+# Retention:           1 (maximum for basic tier)
+New-AzEventHub -ResourceGroupName $resourceGroupName -NamespaceName $eventHubsNamespaceName -EventHubName hub-1 -PartitionCount 4 -MessageRetentionInDays 1
 
-# Blob Storage Account
-# Name:                learningeventhubs (learningazurestorage was taken)
-# Location:            westus2 (West US 2)
-# Performance:         Standard
+# Storage Account
+# SKU:                 Standard_LRS (includes performance tier and replication scope)
 # Kind:                StorageV2
 # Replication:         LRS
 # Tier:                Hot
+$storageAccount = New-AzStorageAccount -ResourceGroupName $resourceGroupName -StorageAccountName $storageAccountName -SkuName Standard_LRS -Location $resourceLocation -Kind StorageV2 -AccessTier Hot -EnableHttpsTrafficOnly $true
+$storageContext = $storageAccount.Context
 
 # Blob Storage Container (Event Hub Processor Checkpointing)
-# Name:                event-hubs-checkpoints
 # Access:              Private
+New-AzStorageContainer -Container $storageContainerName -PublicAccess Off -Context $storageContext
