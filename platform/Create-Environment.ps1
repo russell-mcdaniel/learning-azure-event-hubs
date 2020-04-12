@@ -6,29 +6,32 @@
 #Connect-AzAccount
 
 # Resource Group
-# Name:                learning-azure-storage
-# Location:            westus2 (West US 2)
-#New-AzResourceGroup –Name learning-azure-storage –Location westus2
+# Name:                learning-azure-event-hubs
+# Location:            West US 2
+New-AzResourceGroup –Name learning-azure-event-hubs –Location "West US 2"
 
 # Event Hub Namespace
-# Name:                learning-azure-storage
+# NamespaceName:       learning-azure-event-hubs
+# Location:            West US 2
 # Tier:                Basic
-# Location:            westus2 (West US 2)
 # TU:                  1
-#New-AzEventHubNamespace -ResourceGroupName learning-azure-storage -NamespaceName learning-azure-storage -Location westus2 -SkuName Basic -SkuCapacity 1
+New-AzEventHubNamespace -ResourceGroupName learning-azure-event-hubs -NamespaceName learning-azure-event-hubs -Location "West US 2" -SkuName Basic -SkuCapacity 1
 
 # Event Hub
 # Name:                hub-1
+# NamespaceName:       learning-azure-event-hubs
 # Partitions:          4 (2 is default, minimum)
-#New-AzEventHub -ResourceGroupName learning-azure-storage -NamespaceName learning-azure-storage -EventHubName hub-1 -PartitionCount 4 -MessageRetentionInDays 1
+# Retention:           1 (maximum for basic tier)
+New-AzEventHub -ResourceGroupName learning-azure-event-hubs -NamespaceName learning-azure-event-hubs -EventHubName hub-1 -PartitionCount 4 -MessageRetentionInDays 1
 
-# Blob Storage Account
-# Name:                learningeventhubs (learningazurestorage was taken)
+# Storage Account
+# Name:                learningeventhubs
 # Location:            westus2 (West US 2)
 # Performance:         Standard
 # Kind:                StorageV2
 # Replication:         LRS
 # Tier:                Hot
+
 
 # Blob Storage Container (Event Hub Processor Checkpointing)
 # Name:                event-hubs-checkpoints
