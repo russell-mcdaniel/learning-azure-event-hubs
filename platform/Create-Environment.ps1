@@ -11,16 +11,22 @@ $ResourceGroupName = "learning-azure-event-hubs"
 $ResourceLocation = "West US 2"
 
 $EventHubsNamespaceName = "learning-azure-event-hubs"
-$PartitionCount = 4
+$EventHubsSkuName = "Basic" # Basic | Standard
+$EventHubsSkuCapacity = 1
+$EventHubPartitionCount = 4
+$EventHubMessageRetentionInDays = 1
 $EventHubs = @(
-    "eventhub-01",
-    "eventhub-02",
-    "eventhub-03"
+    "event-hub-01",
+    "event-hub-02",
+    "event-hub-03"
 )
 $ConsumerGroups = @(
-    "consumergroup-01",
-    "consumergroup-02",
-    "consumergroup-03"
+    "eh-01-group-a",
+    "eh-01-group-b",
+    "eh-02-group-a",
+    "eh-02-group-b",
+    "eh-03-group-a",
+    "eh-03-group-b"
 )
 
 $StorageAccountName = "learningeventhubs"
@@ -32,9 +38,20 @@ $WebApps = @(
     "laeh-producer-02",
     "laeh-producer-03",
 
-    "laeh-consumer-01",
-    "laeh-consumer-02",
-    "laeh-consumer-03"
+    "laeh-consumer-01-a1",
+    "laeh-consumer-01-a2",
+    "laeh-consumer-01-b1",
+    "laeh-consumer-01-b2",
+    
+    "laeh-consumer-02-a1",
+    "laeh-consumer-02-a2",
+    "laeh-consumer-02-b1",
+    "laeh-consumer-02-b2",
+
+    "laeh-consumer-03-a1",
+    "laeh-consumer-03-a2",
+    "laeh-consumer-03-b1",
+    "laeh-consumer-03-b2"
 )
 
 # Log in to Azure
@@ -44,16 +61,14 @@ Connect-AzAccount -Subscription "$SubscriptionId"
 New-AzResourceGroup -ResourceGroupName "$ResourceGroupName" -Location "$ResourceLocation"
 
 # Event Hubs Namespace
-# Tier:                Standard
-# TU:                  1
-New-AzEventHubNamespace -ResourceGroupName "$ResourceGroupName" -NamespaceName "$EventHubsNamespaceName" -Location "$ResourceLocation" -SkuName "Standard" -SkuCapacity 1
+New-AzEventHubNamespace -ResourceGroupName "$ResourceGroupName" -NamespaceName "$EventHubsNamespaceName" -Location "$ResourceLocation" -SkuName "$EventHubsSkuName" -SkuCapacity $EventHubsSkuCapacity
 
 # Event Hubs / Event Hub Consumer Groups
 # Partitions:          4 (2 is default, minimum)
 # Retention:           1 (maximum for basic tier)
 Foreach ($EventHub in $EventHubs)
 {
-    New-AzEventHub -ResourceGroupName "$ResourceGroupName" -NamespaceName "$EventHubsNamespaceName" -EventHubName "$EventHub" -PartitionCount $PartitionCount -MessageRetentionInDays 1
+    New-AzEventHub -ResourceGroupName "$ResourceGroupName" -NamespaceName "$EventHubsNamespaceName" -EventHubName "$EventHub" -PartitionCount $EventHubPartitionCount -MessageRetentionInDays $EventHubMessageRetentionInDays
 
     Foreach ($ConsumerGroup in $ConsumerGroups)
     {
